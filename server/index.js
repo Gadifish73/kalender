@@ -6,6 +6,7 @@ const pgSession = require('connect-pg-simple')(session);
 const { pool, init } = require('./db/db');
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
+const saturdayRoutes = require('./routes/saturdays');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -34,6 +35,7 @@ app.use(
 
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/saturdays', saturdayRoutes);
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 

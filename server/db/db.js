@@ -46,6 +46,16 @@ async function init() {
   await pool.query('CREATE INDEX IF NOT EXISTS idx_events_user ON events(user_id)');
   await pool.query('CREATE INDEX IF NOT EXISTS idx_events_start ON events(start_at)');
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS saturday_checks (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      saturday_date DATE NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      UNIQUE (user_id, saturday_date)
+    )
+  `);
+
   const { rows } = await pool.query('SELECT COUNT(*)::int AS n FROM users');
   if (rows[0].n === 0) {
     for (let i = 0; i < SEED_USERNAMES.length; i++) {

@@ -197,18 +197,64 @@
     return d;
   }
 
-  function renderSaturdaysList() {
+  function dateKey(date) {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  }
+
+  async function toggleSaturdayCheck(date, checked) {
+    const key = dateKey(date);
+    try {
+      if (checked) {
+        await api(`/saturdays/${key}`, { method: 'POST' });
+      } else {
+        await api(`/saturdays/${key}`, { method: 'DELETE' });
+      }
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+
+  async function renderSaturdaysList() {
     const nextSaturday = getNextSaturday();
     saturdaysList.innerHTML = '';
     let nextSaturdayRow = null;
 
+    let checkedDates = new Set();
+    try {
+      const { dates } = await api('/saturdays');
+      checkedDates = new Set(dates);
+    } catch (err) {
+      console.error(err);
+    }
+
     for (let i = -SATURDAY_WEEKS_PAST; i <= SATURDAY_WEEKS_FUTURE; i++) {
       const date = new Date(nextSaturday);
       date.setDate(date.getDate() + i * 7);
+      const key = dateKey(date);
 
       const row = document.createElement('div');
       row.className = 'saturday-row';
-      row.textContent = date.toLocaleDateString('de-DE', SATURDAY_TITLE_FORMAT);
+
+      const label = document.createElement('span');
+      label.className = 'saturday-row-label';
+      label.textContent = date.toLocaleDateString('de-DE', SATURDAY_TITLE_FORMAT);
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'saturday-row-checkbox';
+      checkbox.checked = checkedDates.has(key);
+      checkbox.setAttribute('aria-label', label.textContent);
+      checkbox.addEventListener('change', async () => {
+        const wanted = checkbox.checked;
+        checkbox.disabled = true;
+        const ok = await toggleSaturdayCheck(date, wanted);
+        if (!ok) checkbox.checked = !wanted;
+        checkbox.disabled = false;
+      });
+
+      row.append(label, checkbox);
       saturdaysList.appendChild(row);
 
       if (i === 0) nextSaturdayRow = row;

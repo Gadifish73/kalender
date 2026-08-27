@@ -197,12 +197,26 @@ button { font: inherit; cursor: pointer; }
 }
 
 .saturday-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 20px 18px;
   border: 2px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
+}
+
+.saturday-row-label {
   font-size: 17px;
   font-weight: 600;
+}
+
+.saturday-row-checkbox {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  accent-color: var(--primary);
 }
 
 .profile-view {
