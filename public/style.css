@@ -197,10 +197,11 @@ button { font: inherit; cursor: pointer; }
 }
 
 .saturday-row {
-  padding: 14px 16px;
-  border: 1px solid var(--border);
+  padding: 20px 18px;
+  border: 2px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
+  font-size: 17px;
   font-weight: 600;
 }
 

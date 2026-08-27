@@ -186,7 +186,7 @@
 
   // ---------- Saturdays view ----------
 
-  const SATURDAY_TITLE_FORMAT = { weekday: 'long', day: 'numeric', month: 'long' };
+  const SATURDAY_TITLE_FORMAT = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
   const SATURDAY_WEEKS_PAST = 52;
   const SATURDAY_WEEKS_FUTURE = 104;
 
