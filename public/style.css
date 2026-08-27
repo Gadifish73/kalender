@@ -345,10 +345,11 @@ button { font: inherit; cursor: pointer; }
 }
 
 .day-event-info { display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
+.day-event-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .day-event-time { font-size: 12px; color: var(--text-muted); }
 .day-event-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .day-event-category { font-size: 11px; font-weight: 700; }
-.day-event-owner { font-size: 12px; color: var(--text-muted); }
+.day-event-owner { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
 .day-event-description { font-size: 13px; color: var(--text-muted); white-space: normal; }
 
 .day-empty {

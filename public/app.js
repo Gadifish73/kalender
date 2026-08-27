@@ -451,10 +451,20 @@
           const info = document.createElement('span');
           info.className = 'day-event-info';
 
+          const titleRow = document.createElement('span');
+          titleRow.className = 'day-event-title-row';
+
           const title = document.createElement('span');
           title.className = 'day-event-title';
           title.textContent = ev.title;
-          info.append(title);
+          titleRow.append(title);
+
+          const owner = document.createElement('span');
+          owner.className = 'day-event-owner';
+          owner.textContent = ev.generated ? 'Generiert' : `von ${ev.ownerName}`;
+          titleRow.append(owner);
+
+          info.append(titleRow);
 
           const category = categoryLabel(ev.color);
           if (category) {
@@ -469,11 +479,6 @@
           time.className = 'day-event-time';
           time.textContent = formatTimeRange(ev);
           info.append(time);
-
-          const owner = document.createElement('span');
-          owner.className = 'day-event-owner';
-          owner.textContent = ev.generated ? 'Generiert' : `von ${ev.ownerName}`;
-          info.append(owner);
 
           if (ev.description) {
             const description = document.createElement('span');
