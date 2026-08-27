@@ -101,6 +101,9 @@ async function loadOwnedEvent(req, res, next) {
     if (!event) {
       return res.status(404).json({ error: 'Termin nicht gefunden' });
     }
+    if (event.saturday_source !== null) {
+      return res.status(403).json({ error: 'Generierte Termine können nicht bearbeitet werden' });
+    }
     if (event.user_id !== req.session.userId) {
       return res.status(403).json({ error: 'Nur der Ersteller kann diesen Termin bearbeiten' });
     }

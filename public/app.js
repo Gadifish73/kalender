@@ -527,8 +527,10 @@
 
   function openEditModal(ev) {
     editingEventId = ev.id;
-    const isOwner = ev.userId === currentUser.id;
-    modalTitle.textContent = isOwner ? 'Termin bearbeiten' : `Termin von ${ev.ownerName}`;
+    const isOwner = ev.userId === currentUser.id && !ev.generated;
+    modalTitle.textContent = ev.generated
+      ? 'Generierter Termin'
+      : isOwner ? 'Termin bearbeiten' : `Termin von ${ev.ownerName}`;
     eventError.textContent = '';
 
     eventForm.title.value = ev.title;
