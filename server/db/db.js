@@ -38,10 +38,18 @@ async function init() {
       end_at TEXT NOT NULL,
       all_day BOOLEAN NOT NULL DEFAULT false,
       color TEXT NOT NULL DEFAULT '${DEFAULT_EVENT_COLOR}',
+      saturday_source DATE UNIQUE,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `);
+
+  const { rows: eventColumns } = await pool.query(
+    "SELECT column_name FROM information_schema.columns WHERE table_name = 'events'"
+  );
+  if (!eventColumns.some((c) => c.column_name === 'saturday_source')) {
+    await pool.query('ALTER TABLE events ADD COLUMN saturday_source DATE UNIQUE');
+  }
 
   await pool.query('CREATE INDEX IF NOT EXISTS idx_events_user ON events(user_id)');
   await pool.query('CREATE INDEX IF NOT EXISTS idx_events_start ON events(start_at)');
