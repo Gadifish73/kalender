@@ -177,7 +177,7 @@
       profileAvatar.textContent = currentUser.displayName.charAt(0).toUpperCase();
       profileAvatar.style.background = currentUser.color;
     } else if (showSaturdays) {
-      monthLabel.textContent = 'Samstage';
+      monthLabel.textContent = 'Wagenbau?';
       renderSaturdaysList();
     } else {
       monthLabel.textContent = `${MONTH_NAMES[viewDate.getMonth()]} ${viewDate.getFullYear()}`;
