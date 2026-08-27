@@ -443,6 +443,7 @@
           const row = document.createElement('button');
           row.type = 'button';
           row.className = 'day-event-row';
+          row.style.borderColor = ev.color;
 
           const dot = document.createElement('span');
           dot.className = 'day-event-color';
