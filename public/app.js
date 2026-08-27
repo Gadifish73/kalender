@@ -320,6 +320,18 @@
 
   const DAY_TITLE_FORMAT = { weekday: 'long', day: 'numeric', month: 'long' };
 
+  function formatTimeRange(ev) {
+    if (ev.allDay) return 'Ganztägig';
+    const start = new Date(ev.startAt);
+    const end = new Date(ev.endAt);
+    return `${pad(start.getHours())}:${pad(start.getMinutes())} – ${pad(end.getHours())}:${pad(end.getMinutes())}`;
+  }
+
+  function categoryLabel(color) {
+    const match = EVENT_CATEGORIES.find((c) => c.color === color);
+    return match ? match.label : null;
+  }
+
   function openDayModal(date, dayEvents) {
     dayModalTitle.textContent = date.toLocaleDateString('de-DE', DAY_TITLE_FORMAT);
     dayEventsList.innerHTML = '';
@@ -344,16 +356,37 @@
 
           const info = document.createElement('span');
           info.className = 'day-event-info';
-          const time = document.createElement('span');
-          time.className = 'day-event-time';
-          time.textContent = ev.allDay ? 'Ganztägig' : `${pad(new Date(ev.startAt).getHours())}:${pad(new Date(ev.startAt).getMinutes())}`;
+
           const title = document.createElement('span');
           title.className = 'day-event-title';
           title.textContent = ev.title;
+          info.append(title);
+
+          const category = categoryLabel(ev.color);
+          if (category) {
+            const categoryEl = document.createElement('span');
+            categoryEl.className = 'day-event-category';
+            categoryEl.textContent = category;
+            categoryEl.style.color = ev.color;
+            info.append(categoryEl);
+          }
+
+          const time = document.createElement('span');
+          time.className = 'day-event-time';
+          time.textContent = formatTimeRange(ev);
+          info.append(time);
+
           const owner = document.createElement('span');
           owner.className = 'day-event-owner';
-          owner.textContent = ev.ownerName;
-          info.append(time, title, owner);
+          owner.textContent = `von ${ev.ownerName}`;
+          info.append(owner);
+
+          if (ev.description) {
+            const description = document.createElement('span');
+            description.className = 'day-event-description';
+            description.textContent = ev.description;
+            info.append(description);
+          }
 
           row.append(dot, info);
           row.addEventListener('click', () => { closeDayModal(); openEditModal(ev); });
