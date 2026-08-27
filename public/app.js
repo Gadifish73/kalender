@@ -156,9 +156,9 @@
 
   // Bottom nav (mobile): switches pages. Only "Kalender", "Samstage" and
   // "Profil" show real content so far — the remaining placeholder just
-  // leaves the calendar showing. Tapping the already-active Kalender tab
-  // jumps back to today, replacing the "Heute" button that the top bar
-  // loses on mobile.
+  // leaves the calendar showing. Every switch reloads that page's data
+  // fresh from the server, so entries generated elsewhere (e.g. the
+  // Wagenbau event from checking a Saturday) show up immediately.
   function showTab(tab) {
     bottomNavItems.forEach((i) => i.classList.toggle('active', i.dataset.tab === tab));
 
@@ -180,7 +180,7 @@
       monthLabel.textContent = 'Wagenbau?';
       renderSaturdaysList();
     } else {
-      monthLabel.textContent = `${MONTH_NAMES[viewDate.getMonth()]} ${viewDate.getFullYear()}`;
+      loadMonth(); // also updates monthLabel
     }
   }
 
@@ -269,9 +269,12 @@
     item.addEventListener('click', () => {
       const tab = item.dataset.tab;
       const wasActive = item.classList.contains('active');
-      showTab(tab);
       if (tab === 'calendar' && wasActive) {
+        // Already on Kalender: jump to today instead of reloading the
+        // currently-viewed month twice (goToToday() reloads on its own).
         goToToday();
+      } else {
+        showTab(tab);
       }
     });
   });
@@ -469,7 +472,7 @@
 
           const owner = document.createElement('span');
           owner.className = 'day-event-owner';
-          owner.textContent = `von ${ev.ownerName}`;
+          owner.textContent = ev.generated ? 'Generiert' : `von ${ev.ownerName}`;
           info.append(owner);
 
           if (ev.description) {

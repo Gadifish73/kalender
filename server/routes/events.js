@@ -29,6 +29,7 @@ function serialize(row) {
     startAt: row.start_at,
     endAt: row.end_at,
     allDay: !!row.all_day,
+    generated: row.saturday_source !== null,
   };
 }
 
