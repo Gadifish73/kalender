@@ -16,6 +16,12 @@
 
 * { box-sizing: border-box; }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior-y: none;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -27,10 +33,11 @@ body {
 
 /* Auth screen */
 .auth-screen {
-  min-height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow-y: auto;
 }
 
 .auth-card {
@@ -132,7 +139,7 @@ button { font: inherit; cursor: pointer; }
 
 /* App screen */
 .app-screen {
-  min-height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
 }
@@ -177,6 +184,8 @@ button { font: inherit; cursor: pointer; }
 
 .profile-view {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -204,6 +213,9 @@ button { font: inherit; cursor: pointer; }
 
 .calendar-grid {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-auto-rows: minmax(100px, 1fr);
@@ -430,7 +442,49 @@ button { font: inherit; cursor: pointer; }
   .event-chip { display: none; }
   .day-dots { display: flex; }
 
-  .modal { padding: 18px; }
+  /* Modals become full-screen sheets: fixed header + fixed action bar,
+     with only the middle content (form fields / event list) scrolling.
+     Fixes the save/cancel buttons being scrolled out of reach. */
+  .modal-backdrop { padding: 0; align-items: stretch; }
+  .modal {
+    max-width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .modal h3 {
+    margin: 0;
+    padding: 20px 20px 14px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  #event-form {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px;
+    margin: 0;
+  }
+  .day-events-list {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 12px 20px;
+  }
+  .modal-actions {
+    flex-shrink: 0;
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+    margin: 0;
+    border-top: 1px solid var(--border);
+  }
+
   .row { flex-direction: column; gap: 14px; }
 
   .bottom-nav { display: flex; }
