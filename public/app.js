@@ -16,6 +16,9 @@
   const currentUserEl = document.getElementById('current-user');
   const logoutBtn = document.getElementById('logout-btn');
 
+  const saturdaysView = document.getElementById('saturdays-view');
+  const saturdaysList = document.getElementById('saturdays-list');
+
   const profileView = document.getElementById('profile-view');
   const profileAvatar = document.getElementById('profile-avatar');
   const profileName = document.getElementById('profile-name');
@@ -151,26 +154,68 @@
   nextMonthBtn.addEventListener('click', () => goToMonth(1));
   todayBtn.addEventListener('click', goToToday);
 
-  // Bottom nav (mobile): switches pages. Only "Kalender" and "Profil" show
-  // real content so far — the middle two are placeholders for pages that
-  // don't exist yet and just leave the calendar showing. Tapping the
-  // already-active Kalender tab jumps back to today, replacing the "Heute"
-  // button that the top bar loses on mobile.
+  // Bottom nav (mobile): switches pages. Only "Kalender", "Samstage" and
+  // "Profil" show real content so far — the remaining placeholder just
+  // leaves the calendar showing. Tapping the already-active Kalender tab
+  // jumps back to today, replacing the "Heute" button that the top bar
+  // loses on mobile.
   function showTab(tab) {
     bottomNavItems.forEach((i) => i.classList.toggle('active', i.dataset.tab === tab));
 
-    const isProfile = tab === 'profile';
-    profileView.classList.toggle('hidden', !isProfile);
-    weekdayRow.classList.toggle('hidden', isProfile);
-    calendarGrid.classList.toggle('hidden', isProfile);
+    const showCalendar = tab === 'calendar' || tab === 'placeholder-2';
+    const showSaturdays = tab === 'saturdays';
+    const showProfile = tab === 'profile';
 
-    if (isProfile) {
+    weekdayRow.classList.toggle('hidden', !showCalendar);
+    calendarGrid.classList.toggle('hidden', !showCalendar);
+    saturdaysView.classList.toggle('hidden', !showSaturdays);
+    profileView.classList.toggle('hidden', !showProfile);
+
+    if (showProfile) {
       monthLabel.textContent = 'Profil';
       profileName.textContent = currentUser.displayName;
       profileAvatar.textContent = currentUser.displayName.charAt(0).toUpperCase();
       profileAvatar.style.background = currentUser.color;
+    } else if (showSaturdays) {
+      monthLabel.textContent = 'Samstage';
+      renderSaturdaysList();
     } else {
       monthLabel.textContent = `${MONTH_NAMES[viewDate.getMonth()]} ${viewDate.getFullYear()}`;
+    }
+  }
+
+  // ---------- Saturdays view ----------
+
+  const SATURDAY_TITLE_FORMAT = { weekday: 'long', day: 'numeric', month: 'long' };
+  const SATURDAY_WEEKS_PAST = 52;
+  const SATURDAY_WEEKS_FUTURE = 104;
+
+  function getNextSaturday() {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7));
+    return d;
+  }
+
+  function renderSaturdaysList() {
+    const nextSaturday = getNextSaturday();
+    saturdaysList.innerHTML = '';
+    let nextSaturdayRow = null;
+
+    for (let i = -SATURDAY_WEEKS_PAST; i <= SATURDAY_WEEKS_FUTURE; i++) {
+      const date = new Date(nextSaturday);
+      date.setDate(date.getDate() + i * 7);
+
+      const row = document.createElement('div');
+      row.className = 'saturday-row';
+      row.textContent = date.toLocaleDateString('de-DE', SATURDAY_TITLE_FORMAT);
+      saturdaysList.appendChild(row);
+
+      if (i === 0) nextSaturdayRow = row;
+    }
+
+    if (nextSaturdayRow) {
+      nextSaturdayRow.scrollIntoView({ block: 'start' });
     }
   }
 
