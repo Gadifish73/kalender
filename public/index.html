@@ -50,6 +50,13 @@
     <div id="saturdays-list" class="saturdays-list"></div>
   </div>
 
+  <div id="polls-view" class="polls-view hidden">
+    <div class="polls-toolbar">
+      <button type="button" id="new-poll-btn" class="primary-btn">+ Neue Umfrage</button>
+    </div>
+    <div id="polls-list" class="polls-list"></div>
+  </div>
+
   <div id="profile-view" class="profile-view hidden">
     <div class="profile-avatar" id="profile-avatar"></div>
     <p class="profile-name" id="profile-name"></p>
@@ -63,7 +70,7 @@
     <button type="button" class="bottom-nav-item" data-tab="saturdays" aria-label="Samstage">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
     </button>
-    <button type="button" class="bottom-nav-item" data-tab="placeholder-2" aria-label="Platzhalter 2">
+    <button type="button" class="bottom-nav-item" data-tab="polls" aria-label="Umfragen">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
     </button>
     <button type="button" class="bottom-nav-item" data-tab="profile" aria-label="Profil / Abmelden">
@@ -122,6 +129,47 @@
       <div class="spacer"></div>
       <button type="button" id="cancel-event-btn" class="ghost-btn">Abbrechen</button>
       <button type="submit" form="event-form" id="save-event-btn" class="primary-btn">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<div id="poll-create-modal" class="modal-backdrop hidden">
+  <div class="modal">
+    <h3>Neue Umfrage</h3>
+    <form id="poll-create-form">
+      <label>Titel
+        <input type="text" name="title" required maxlength="200" />
+      </label>
+      <label>Beschreibung
+        <textarea name="description" rows="2" maxlength="2000"></textarea>
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" name="multiSelect" checked />
+        Mehrfachauswahl erlauben
+      </label>
+      <label>Optionen
+        <div id="poll-options-list" class="poll-options-edit-list"></div>
+      </label>
+      <button type="button" id="add-poll-option-btn" class="ghost-btn">+ Option hinzufügen</button>
+      <p class="error" id="poll-create-error"></p>
+    </form>
+    <div class="modal-actions">
+      <div class="spacer"></div>
+      <button type="button" id="poll-create-cancel-btn" class="ghost-btn">Abbrechen</button>
+      <button type="submit" form="poll-create-form" class="primary-btn">Erstellen</button>
+    </div>
+  </div>
+</div>
+
+<div id="poll-detail-modal" class="modal-backdrop hidden">
+  <div class="modal">
+    <h3 id="poll-detail-title"></h3>
+    <div id="poll-detail-body"></div>
+    <div class="modal-actions">
+      <button type="button" id="poll-delete-btn" class="danger-btn">Löschen</button>
+      <div class="spacer"></div>
+      <button type="button" id="poll-close-toggle-btn" class="ghost-btn"></button>
+      <button type="button" id="poll-detail-close-btn" class="ghost-btn">Schließen</button>
     </div>
   </div>
 </div>

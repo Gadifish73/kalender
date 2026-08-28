@@ -64,6 +64,51 @@ async function init() {
     )
   `);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS polls (
+      id SERIAL PRIMARY KEY,
+      creator_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      multi_select BOOLEAN NOT NULL DEFAULT true,
+      share_token TEXT NOT NULL UNIQUE,
+      closed BOOLEAN NOT NULL DEFAULT false,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS poll_options (
+      id SERIAL PRIMARY KEY,
+      poll_id INTEGER NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
+      label TEXT NOT NULL,
+      sort_order INTEGER NOT NULL DEFAULT 0
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS poll_participants (
+      id SERIAL PRIMARY KEY,
+      poll_id INTEGER NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
+      voter_token TEXT NOT NULL,
+      voter_name TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      UNIQUE (poll_id, voter_token)
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS poll_selections (
+      participant_id INTEGER NOT NULL REFERENCES poll_participants(id) ON DELETE CASCADE,
+      option_id INTEGER NOT NULL REFERENCES poll_options(id) ON DELETE CASCADE,
+      PRIMARY KEY (participant_id, option_id)
+    )
+  `);
+
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_poll_options_poll ON poll_options(poll_id)');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_poll_participants_poll ON poll_participants(poll_id)');
+
   const { rows } = await pool.query('SELECT COUNT(*)::int AS n FROM users');
   if (rows[0].n === 0) {
     for (let i = 0; i < SEED_USERNAMES.length; i++) {

@@ -7,6 +7,8 @@ const { pool, init } = require('./db/db');
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 const saturdayRoutes = require('./routes/saturdays');
+const pollRoutes = require('./routes/polls');
+const publicPollRoutes = require('./routes/publicPolls');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -36,6 +38,13 @@ app.use(
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/saturdays', saturdayRoutes);
+app.use('/api/polls', pollRoutes);
+app.use('/api/public/polls', publicPollRoutes);
+
+// Public voting page — no login required, reachable via the shared link.
+app.get('/poll/:token', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'poll.html'));
+});
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 

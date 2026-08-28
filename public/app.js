@@ -19,6 +19,24 @@
   const saturdaysView = document.getElementById('saturdays-view');
   const saturdaysList = document.getElementById('saturdays-list');
 
+  const pollsView = document.getElementById('polls-view');
+  const pollsList = document.getElementById('polls-list');
+  const newPollBtn = document.getElementById('new-poll-btn');
+
+  const pollCreateModal = document.getElementById('poll-create-modal');
+  const pollCreateForm = document.getElementById('poll-create-form');
+  const pollOptionsList = document.getElementById('poll-options-list');
+  const addPollOptionBtn = document.getElementById('add-poll-option-btn');
+  const pollCreateError = document.getElementById('poll-create-error');
+  const pollCreateCancelBtn = document.getElementById('poll-create-cancel-btn');
+
+  const pollDetailModal = document.getElementById('poll-detail-modal');
+  const pollDetailTitle = document.getElementById('poll-detail-title');
+  const pollDetailBody = document.getElementById('poll-detail-body');
+  const pollDeleteBtn = document.getElementById('poll-delete-btn');
+  const pollCloseToggleBtn = document.getElementById('poll-close-toggle-btn');
+  const pollDetailCloseBtn = document.getElementById('poll-detail-close-btn');
+
   const profileView = document.getElementById('profile-view');
   const profileAvatar = document.getElementById('profile-avatar');
   const profileName = document.getElementById('profile-name');
@@ -154,21 +172,22 @@
   nextMonthBtn.addEventListener('click', () => goToMonth(1));
   todayBtn.addEventListener('click', goToToday);
 
-  // Bottom nav (mobile): switches pages. Only "Kalender", "Samstage" and
-  // "Profil" show real content so far — the remaining placeholder just
-  // leaves the calendar showing. Every switch reloads that page's data
-  // fresh from the server, so entries generated elsewhere (e.g. the
-  // Wagenbau event from checking a Saturday) show up immediately.
+  // Bottom nav (mobile): switches pages. "Kalender", "Samstage", "Umfragen"
+  // and "Profil" all show real content now. Every switch reloads that
+  // page's data fresh from the server, so entries generated elsewhere
+  // (e.g. the Wagenbau event from checking a Saturday) show up immediately.
   function showTab(tab) {
     bottomNavItems.forEach((i) => i.classList.toggle('active', i.dataset.tab === tab));
 
-    const showCalendar = tab === 'calendar' || tab === 'placeholder-2';
+    const showCalendar = tab === 'calendar';
     const showSaturdays = tab === 'saturdays';
+    const showPolls = tab === 'polls';
     const showProfile = tab === 'profile';
 
     weekdayRow.classList.toggle('hidden', !showCalendar);
     calendarGrid.classList.toggle('hidden', !showCalendar);
     saturdaysView.classList.toggle('hidden', !showSaturdays);
+    pollsView.classList.toggle('hidden', !showPolls);
     profileView.classList.toggle('hidden', !showProfile);
 
     if (showProfile) {
@@ -179,6 +198,9 @@
     } else if (showSaturdays) {
       monthLabel.textContent = 'Wagenbau?';
       renderSaturdaysList();
+    } else if (showPolls) {
+      monthLabel.textContent = 'Umfragen';
+      renderPollsList();
     } else {
       loadMonth(); // also updates monthLabel
     }
@@ -409,6 +431,228 @@
       calendarGrid.appendChild(cell);
     }
   }
+
+  // ---------- Polls view ----------
+
+  async function renderPollsList() {
+    pollsList.innerHTML = '';
+    let polls = [];
+    try {
+      ({ polls } = await api('/polls'));
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (polls.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'poll-empty';
+      empty.textContent = 'Noch keine Umfragen erstellt.';
+      pollsList.appendChild(empty);
+      return;
+    }
+
+    polls.forEach((poll) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'poll-card';
+
+      const title = document.createElement('span');
+      title.className = 'poll-card-title';
+      title.textContent = poll.title;
+
+      const meta = document.createElement('span');
+      meta.className = 'poll-card-meta' + (poll.closed ? ' closed' : '');
+      meta.textContent = `${poll.participantCount} Teilnehmer${poll.closed ? ' — geschlossen' : ''}`;
+
+      card.append(title, meta);
+      card.addEventListener('click', () => openPollDetailModal(poll));
+      pollsList.appendChild(card);
+    });
+  }
+
+  function pollShareUrl(poll) {
+    return `${window.location.origin}/poll/${poll.shareToken}`;
+  }
+
+  function renderPollResults(poll) {
+    const wrap = document.createElement('div');
+    wrap.className = 'poll-options';
+
+    const totalParticipants = new Set(poll.options.flatMap((o) => o.voters)).size;
+
+    poll.options.forEach((option) => {
+      const row = document.createElement('div');
+      row.className = 'poll-option-row';
+
+      const main = document.createElement('div');
+      main.className = 'poll-option-main';
+
+      const labelRow = document.createElement('div');
+      labelRow.className = 'poll-option-label-row';
+      const labelText = document.createElement('span');
+      labelText.className = 'poll-option-label';
+      labelText.textContent = option.label;
+      const count = document.createElement('span');
+      count.className = 'poll-option-count';
+      count.textContent = `${option.voters.length} ${option.voters.length === 1 ? 'Stimme' : 'Stimmen'}`;
+      labelRow.append(labelText, count);
+
+      const barTrack = document.createElement('div');
+      barTrack.className = 'poll-option-bar-track';
+      const bar = document.createElement('div');
+      bar.className = 'poll-option-bar';
+      const pct = totalParticipants > 0 ? Math.round((option.voters.length / totalParticipants) * 100) : 0;
+      bar.style.width = `${pct}%`;
+      barTrack.appendChild(bar);
+
+      main.append(labelRow, barTrack);
+
+      if (option.voters.length > 0) {
+        const voters = document.createElement('p');
+        voters.className = 'poll-option-voters';
+        voters.textContent = option.voters.join(', ');
+        main.appendChild(voters);
+      }
+
+      row.appendChild(main);
+      wrap.appendChild(row);
+    });
+
+    return wrap;
+  }
+
+  function openPollDetailModal(poll) {
+    pollDetailTitle.textContent = poll.title;
+    pollDetailBody.innerHTML = '';
+
+    if (poll.description) {
+      const desc = document.createElement('p');
+      desc.className = 'poll-description';
+      desc.textContent = poll.description;
+      pollDetailBody.appendChild(desc);
+    }
+
+    const shareRow = document.createElement('div');
+    shareRow.className = 'poll-share-row';
+    const shareInput = document.createElement('input');
+    shareInput.type = 'text';
+    shareInput.readOnly = true;
+    shareInput.value = pollShareUrl(poll);
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'ghost-btn';
+    copyBtn.textContent = 'Kopieren';
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(shareInput.value);
+        copyBtn.textContent = 'Kopiert!';
+      } catch (err) {
+        shareInput.select();
+        copyBtn.textContent = 'Markiert';
+      }
+      setTimeout(() => { copyBtn.textContent = 'Kopieren'; }, 1500);
+    });
+    shareRow.append(shareInput, copyBtn);
+    pollDetailBody.appendChild(shareRow);
+
+    pollDetailBody.appendChild(renderPollResults(poll));
+
+    pollCloseToggleBtn.textContent = poll.closed ? 'Umfrage wieder öffnen' : 'Umfrage schließen';
+    pollCloseToggleBtn.onclick = async () => {
+      try {
+        const { poll: updated } = await api(`/polls/${poll.id}/close`, {
+          method: 'POST',
+          body: JSON.stringify({ closed: !poll.closed }),
+        });
+        openPollDetailModal(updated);
+        renderPollsList();
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    pollDeleteBtn.onclick = async () => {
+      if (!confirm('Diese Umfrage wirklich löschen?')) return;
+      try {
+        await api(`/polls/${poll.id}`, { method: 'DELETE' });
+        closePollDetailModal();
+        renderPollsList();
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    pollDetailModal.classList.remove('hidden');
+  }
+
+  function closePollDetailModal() {
+    pollDetailModal.classList.add('hidden');
+  }
+
+  pollDetailCloseBtn.addEventListener('click', closePollDetailModal);
+  pollDetailModal.addEventListener('click', (e) => { if (e.target === pollDetailModal) closePollDetailModal(); });
+
+  function addPollOptionRow(value) {
+    const row = document.createElement('div');
+    row.className = 'poll-option-edit-row';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = 200;
+    input.placeholder = 'Option';
+    input.value = value || '';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'icon-btn';
+    removeBtn.setAttribute('aria-label', 'Option entfernen');
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', () => row.remove());
+
+    row.append(input, removeBtn);
+    pollOptionsList.appendChild(row);
+  }
+
+  newPollBtn.addEventListener('click', () => {
+    pollCreateForm.reset();
+    pollCreateError.textContent = '';
+    pollOptionsList.innerHTML = '';
+    addPollOptionRow();
+    addPollOptionRow();
+    pollCreateModal.classList.remove('hidden');
+  });
+
+  addPollOptionBtn.addEventListener('click', () => addPollOptionRow());
+
+  function closePollCreateModal() {
+    pollCreateModal.classList.add('hidden');
+  }
+
+  pollCreateCancelBtn.addEventListener('click', closePollCreateModal);
+  pollCreateModal.addEventListener('click', (e) => { if (e.target === pollCreateModal) closePollCreateModal(); });
+
+  pollCreateForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    pollCreateError.textContent = '';
+    const fd = new FormData(pollCreateForm);
+    const options = [...pollOptionsList.querySelectorAll('input')].map((el) => el.value);
+
+    try {
+      await api('/polls', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: fd.get('title'),
+          description: fd.get('description'),
+          multiSelect: fd.get('multiSelect') === 'on',
+          options,
+        }),
+      });
+      closePollCreateModal();
+      renderPollsList();
+    } catch (err) {
+      pollCreateError.textContent = err.message;
+    }
+  });
 
   // ---------- Day modal (mobile day agenda) ----------
 
