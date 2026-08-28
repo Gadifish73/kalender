@@ -523,6 +523,11 @@ input:disabled, textarea:disabled, select:disabled { opacity: 0.6; cursor: not-a
   .row { flex-direction: column; gap: 14px; }
 
   .bottom-nav { display: flex; }
+
+  /* Public poll page: edge-to-edge card so the option boxes get the
+     full screen width instead of being capped/margined like on desktop. */
+  .poll-page { padding: 20px 10px; }
+  .poll-page-card { max-width: 100%; padding: 20px 14px; }
 }
 
 @media (min-width: 641px) {
@@ -531,13 +536,15 @@ input:disabled, textarea:disabled, select:disabled { opacity: 0.6; cursor: not-a
 
 /* Public poll page */
 .poll-page {
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   justify-content: center;
   padding: 32px 16px;
 }
 
-.poll-card {
+.poll-page-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
