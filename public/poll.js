@@ -76,6 +76,9 @@
       const row = document.createElement('label');
       row.className = 'poll-option-row';
 
+      const header = document.createElement('div');
+      header.className = 'poll-option-header';
+
       const input = document.createElement('input');
       input.type = poll.multiSelect ? 'checkbox' : 'radio';
       input.name = 'poll-option';
@@ -84,9 +87,6 @@
       if (poll.you && poll.you.optionIds.includes(option.id)) {
         input.checked = true;
       }
-
-      const main = document.createElement('div');
-      main.className = 'poll-option-main';
 
       const labelRow = document.createElement('div');
       labelRow.className = 'poll-option-label-row';
@@ -98,6 +98,9 @@
       count.textContent = `${option.voters.length} ${option.voters.length === 1 ? 'Stimme' : 'Stimmen'}`;
       labelRow.append(labelText, count);
 
+      header.append(input, labelRow);
+      row.appendChild(header);
+
       const barTrack = document.createElement('div');
       barTrack.className = 'poll-option-bar-track';
       const bar = document.createElement('div');
@@ -105,17 +108,15 @@
       const pct = totalParticipants > 0 ? Math.round((option.voters.length / totalParticipants) * 100) : 0;
       bar.style.width = `${pct}%`;
       barTrack.appendChild(bar);
-
-      main.append(labelRow, barTrack);
+      row.appendChild(barTrack);
 
       if (option.voters.length > 0) {
         const voters = document.createElement('p');
         voters.className = 'poll-option-voters';
         voters.textContent = option.voters.join(', ');
-        main.appendChild(voters);
+        row.appendChild(voters);
       }
 
-      row.append(input, main);
       form.appendChild(row);
     });
 

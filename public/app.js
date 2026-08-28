@@ -484,9 +484,6 @@
       const row = document.createElement('div');
       row.className = 'poll-option-row';
 
-      const main = document.createElement('div');
-      main.className = 'poll-option-main';
-
       const labelRow = document.createElement('div');
       labelRow.className = 'poll-option-label-row';
       const labelText = document.createElement('span');
@@ -496,6 +493,7 @@
       count.className = 'poll-option-count';
       count.textContent = `${option.voters.length} ${option.voters.length === 1 ? 'Stimme' : 'Stimmen'}`;
       labelRow.append(labelText, count);
+      row.appendChild(labelRow);
 
       const barTrack = document.createElement('div');
       barTrack.className = 'poll-option-bar-track';
@@ -504,17 +502,14 @@
       const pct = totalParticipants > 0 ? Math.round((option.voters.length / totalParticipants) * 100) : 0;
       bar.style.width = `${pct}%`;
       barTrack.appendChild(bar);
-
-      main.append(labelRow, barTrack);
+      row.appendChild(barTrack);
 
       if (option.voters.length > 0) {
         const voters = document.createElement('p');
         voters.className = 'poll-option-voters';
         voters.textContent = option.voters.join(', ');
-        main.appendChild(voters);
+        row.appendChild(voters);
       }
-
-      row.appendChild(main);
       wrap.appendChild(row);
     });
 
