@@ -400,7 +400,7 @@ input:disabled, textarea:disabled, select:disabled { opacity: 0.6; cursor: not-a
 
 .modal h3 { margin-top: 0; }
 
-#event-form { display: flex; flex-direction: column; gap: 14px; }
+#event-form, #poll-create-form { display: flex; flex-direction: column; gap: 14px; }
 
 .checkbox-row {
   flex-direction: row;
@@ -504,21 +504,14 @@ input:disabled, textarea:disabled, select:disabled { opacity: 0.6; cursor: not-a
     flex-shrink: 0;
     border-bottom: 1px solid var(--border);
   }
-  #event-form {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 20px;
-    margin: 0;
-  }
-  .day-events-list {
+  .modal-scroll-area {
     flex: 1;
     min-height: 0;
     max-height: none;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    margin: 12px 20px;
+    padding: 20px;
+    margin: 0;
   }
   .modal-actions {
     flex-shrink: 0;

@@ -82,7 +82,7 @@
 <div id="day-modal" class="modal-backdrop hidden">
   <div class="modal">
     <h3 id="day-modal-title"></h3>
-    <div id="day-events-list" class="day-events-list"></div>
+    <div id="day-events-list" class="day-events-list modal-scroll-area"></div>
     <div class="modal-actions">
       <button type="button" id="day-close-btn" class="ghost-btn">Schließen</button>
       <div class="spacer"></div>
@@ -94,7 +94,7 @@
 <div id="event-modal" class="modal-backdrop hidden">
   <div class="modal">
     <h3 id="modal-title">Neuer Termin</h3>
-    <form id="event-form">
+    <form id="event-form" class="modal-scroll-area">
       <label>Titel
         <input type="text" name="title" required maxlength="200" />
       </label>
@@ -136,7 +136,7 @@
 <div id="poll-create-modal" class="modal-backdrop hidden">
   <div class="modal">
     <h3>Neue Umfrage</h3>
-    <form id="poll-create-form">
+    <form id="poll-create-form" class="modal-scroll-area">
       <label>Titel
         <input type="text" name="title" required maxlength="200" />
       </label>
@@ -164,7 +164,7 @@
 <div id="poll-detail-modal" class="modal-backdrop hidden">
   <div class="modal">
     <h3 id="poll-detail-title"></h3>
-    <div id="poll-detail-body"></div>
+    <div id="poll-detail-body" class="modal-scroll-area"></div>
     <div class="modal-actions">
       <button type="button" id="poll-delete-btn" class="danger-btn">Löschen</button>
       <div class="spacer"></div>
